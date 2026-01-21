@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +19,7 @@ export default function BookmarkButton({
 }: BookmarkButtonProps) {
   const { isBookmarked, toggle } = useBookmarks();
   const bookmarked = isBookmarked(appid);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const sizeClasses = {
     sm: 'w-8 h-8',
@@ -31,13 +33,20 @@ export default function BookmarkButton({
     lg: 'w-6 h-6',
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Trigger bounce animation
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 300);
+    
+    toggle(appid);
+  };
+
   return (
     <button
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggle(appid);
-      }}
+      onClick={handleClick}
       className={cn(
         'flex items-center justify-center gap-2 border transition-all duration-200',
         showLabel
@@ -54,9 +63,13 @@ export default function BookmarkButton({
       <svg
         className={cn(
           showLabel ? 'w-4 h-4' : iconSizes[size],
-          'transition-colors duration-200',
-          bookmarked ? 'text-accent fill-accent' : 'text-text-secondary'
+          'transition-all duration-200',
+          bookmarked ? 'text-accent fill-accent' : 'text-text-secondary',
+          isAnimating && 'scale-125'
         )}
+        style={{
+          transition: isAnimating ? 'transform 0.15s ease-out' : 'transform 0.15s ease-in, color 0.2s',
+        }}
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill={bookmarked ? 'currentColor' : 'none'}

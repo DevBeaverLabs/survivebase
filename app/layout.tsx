@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import BottomNav from '@/components/layout/BottomNav';
 import ThemeProvider from '@/components/ui/ThemeProvider';
 
 export const viewport: Viewport = {
@@ -64,10 +65,11 @@ export default function RootLayout({
       <body className="bg-bg-primary text-text-primary antialiased flex flex-col min-h-screen">
         <ThemeProvider>
           <Header />
-          <main className="flex-grow pt-16">
+          <main className="flex-grow pt-16 pb-20 md:pb-0">
             {children}
           </main>
-          <Footer />
+          <Footer className="hidden md:block" />
+          <BottomNav />
         </ThemeProvider>
       </body>
     </html>

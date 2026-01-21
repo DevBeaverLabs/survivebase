@@ -15,6 +15,22 @@
   --warning: #f97316;
   --error: #ef4444;
   --border: #30363d;
+
+  /* Gradient System */
+  --accent-start: #58a6ff;
+  --accent-end: #10b981;
+  
+  /* Glow Effects */
+  --glow-color: rgba(88, 166, 255, 0.3);
+  --glow-color-strong: rgba(88, 166, 255, 0.5);
+  
+  /* Review Rating Colors */
+  --review-overwhelming: #10b981;
+  --review-very-positive: #22c55e;
+  --review-positive: #84cc16;
+  --review-mixed: #eab308;
+  --review-negative: #f97316;
+  --review-very-negative: #ef4444;
 }
 
 /* Light Mode */
@@ -30,6 +46,22 @@
   --warning: #bf8700;
   --error: #cf222e;
   --border: #d0d7de;
+
+  /* Gradient System */
+  --accent-start: #0969da;
+  --accent-end: #059669;
+  
+  /* Glow Effects */
+  --glow-color: rgba(9, 105, 218, 0.2);
+  --glow-color-strong: rgba(9, 105, 218, 0.4);
+  
+  /* Review Rating Colors */
+  --review-overwhelming: #059669;
+  --review-very-positive: #16a34a;
+  --review-positive: #65a30d;
+  --review-mixed: #ca8a04;
+  --review-negative: #ea580c;
+  --review-very-negative: #dc2626;
 }
 
 @theme inline {
@@ -45,6 +77,22 @@
   --color-warning: var(--warning);
   --color-error: var(--error);
   --color-border: var(--border);
+
+  /* Gradient System */
+  --color-accent-start: var(--accent-start);
+  --color-accent-end: var(--accent-end);
+  
+  /* Glow Effects */
+  --color-glow: var(--glow-color);
+  --color-glow-strong: var(--glow-color-strong);
+  
+  /* Review Rating Colors */
+  --color-review-overwhelming: var(--review-overwhelming);
+  --color-review-very-positive: var(--review-very-positive);
+  --color-review-positive: var(--review-positive);
+  --color-review-mixed: var(--review-mixed);
+  --color-review-negative: var(--review-negative);
+  --color-review-very-negative: var(--review-very-negative);
 
   /* Fonts */
   --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -92,4 +140,25 @@ body {
 ::selection {
   background-color: var(--accent);
   color: var(--bg-primary);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-fade-in-up-delay {
+  animation: fadeInUp 0.6s ease-out 0.2s forwards;
+  opacity: 0;
 }

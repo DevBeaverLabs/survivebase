@@ -6,12 +6,13 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import ImageWithFallback from '@/components/ui/ImageWithFallback';
 import SimilarGames from '@/components/game/SimilarGames';
-import { formatPrice, getReviewLabel, getSteamUrl, cn } from '@/lib/utils';
+import { RecentGameTracker, GameDetailBookmark, ScreenshotGallery } from '@/components/game/GameDetailClient';
+import { formatPrice, getReviewLabel, getReviewVariant, getSteamUrl } from '@/lib/utils';
 
 interface GamePageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 // Generate static params for SSG
@@ -23,7 +24,9 @@ export async function generateStaticParams() {
 }
 
 export default async function GamePage({ params }: GamePageProps) {
-  const gameId = parseInt(params.id);
+  const resolvedParams = await params;
+  const gameId = parseInt(resolvedParams.id);
+  
   const [game, allGames] = await Promise.all([
     getGameById(gameId),
     getGames(),
@@ -37,17 +40,23 @@ export default async function GamePage({ params }: GamePageProps) {
 
   return (
     <div className="pb-20">
-      {/* Hero Header */}
+      {/* Track recent game view */}
+      <RecentGameTracker appid={game.appid} />
+      
+      {/* Hero Header with Glassmorphism */}
       <div className="relative w-full h-[40vh] md:h-[60vh] overflow-hidden">
+        {/* Background Image with blur */}
         <ImageWithFallback
           src={game.headerImage}
           alt={game.name}
           fill
           priority
-          className="object-cover"
+          className="object-cover scale-105 blur-sm"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/40 to-transparent" />
+        {/* Glassmorphism overlay */}
+        <div className="absolute inset-0 bg-bg-primary/60 backdrop-blur-sm" />
         
+        {/* Content overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <Container>
             <div className="max-w-4xl">
@@ -76,7 +85,7 @@ export default async function GamePage({ params }: GamePageProps) {
               </h1>
               <div className="flex flex-wrap gap-2 mb-8">
                 {game.tags.slice(0, 8).map((tag) => (
-                  <Badge key={tag} className="px-3 py-1 text-xs">
+                  <Badge key={tag} variant="outline" className="px-3 py-1 text-xs bg-bg-secondary/50 backdrop-blur-sm">
                     {tag}
                   </Badge>
                 ))}
@@ -100,79 +109,76 @@ export default async function GamePage({ params }: GamePageProps) {
             {game.screenshots.length > 0 && (
               <section>
                 <h2 className="text-2xl font-bold mb-6 border-l-4 border-accent pl-4">스크린샷</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {game.screenshots.slice(0, 4).map((screenshot, index) => (
-                    <div key={index} className="relative aspect-video rounded-lg overflow-hidden border border-border">
-                      <ImageWithFallback
-                        src={screenshot}
-                        alt={`${game.name} screenshot ${index + 1}`}
-                        fill
-                        className="object-cover hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                  ))}
-                </div>
+                <ScreenshotGallery screenshots={game.screenshots} gameName={game.name} />
               </section>
             )}
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar with Glassmorphism */}
           <div className="space-y-6">
-            <div className="bg-bg-secondary border border-border rounded-xl p-6 sticky top-24">
+            <div className="bg-bg-secondary/70 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sticky top-24 shadow-xl">
               <div className="space-y-6">
                 {/* Price Section */}
-                <div>
-                  <h3 className="text-sm text-text-secondary font-medium mb-2">현재 가격</h3>
-                  <div className="flex items-center gap-3">
-                    {hasDiscount ? (
-                      <>
-                        <Badge variant="success" className="text-sm px-2 py-1">
-                          -{game.price.discountPercent}%
-                        </Badge>
-                        <div className="flex flex-col">
-                          <span className="text-sm text-text-secondary line-through">
-                            {formatPrice(game.price.initial)}
-                          </span>
-                          <span className="text-2xl font-bold text-accent">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-accent">
+                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xs text-text-secondary font-medium">현재 가격</h3>
+                    <div className="flex items-center gap-2">
+                      {hasDiscount ? (
+                        <>
+                          <span className="text-xl font-bold text-accent">
                             {formatPrice(game.price.final)}
                           </span>
-                        </div>
-                      </>
-                    ) : (
-                      <span className="text-2xl font-bold text-text-primary">
-                        {formatPrice(game.price.final)}
-                      </span>
-                    )}
+                          <Badge variant="success" className="text-xs">
+                            -{game.price.discountPercent}%
+                          </Badge>
+                        </>
+                      ) : (
+                        <span className="text-xl font-bold text-text-primary">
+                          {formatPrice(game.price.final)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
                 {/* Review Section */}
-                <div className="pt-6 border-t border-border">
-                  <h3 className="text-sm text-text-secondary font-medium mb-2">최근 평가</h3>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={cn(
-                        'text-lg font-bold',
-                        game.reviews.score >= 70 ? 'text-success' : 'text-warning'
-                      )}
-                    >
-                      {getReviewLabel(game.reviews.score)}
-                    </span>
-                    <span className="text-sm text-text-secondary">
-                      ({game.reviews.score}%)
-                    </span>
+                <div className="flex items-center gap-4 pt-4 border-t border-white/10">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-accent">
+                      <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xs text-text-secondary font-medium">사용자 평가</h3>
+                    <div className="flex items-center gap-2">
+                      <Badge reviewVariant={getReviewVariant(game.reviews.score)} className="text-xs">
+                        {getReviewLabel(game.reviews.score)}
+                      </Badge>
+                      <span className="text-sm text-text-secondary">
+                        {game.reviews.score}%
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Info Section */}
-                <div className="pt-6 border-t border-border space-y-4">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-text-secondary">출시일</span>
-                    <span className="text-text-primary">{game.releaseDate}</span>
+                {/* Release Date */}
+                <div className="flex items-center gap-4 pt-4 border-t border-white/10">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-accent">
+                      <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                      <line x1="16" x2="16" y1="2" y2="6" />
+                      <line x1="8" x2="8" y1="2" y2="6" />
+                      <line x1="3" x2="21" y1="10" y2="10" />
+                    </svg>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-text-secondary">개발사/배급사</span>
-                    <span className="text-text-primary truncate ml-4">Steam Store 참조</span>
+                  <div>
+                    <h3 className="text-xs text-text-secondary font-medium">출시일</h3>
+                    <span className="text-sm font-medium text-text-primary">{game.releaseDate}</span>
                   </div>
                 </div>
 
@@ -188,9 +194,7 @@ export default async function GamePage({ params }: GamePageProps) {
                       Steam에서 보기
                     </Button>
                   </a>
-                  <Button className="w-full py-6 text-lg" variant="secondary" disabled>
-                    관심 목록에 추가
-                  </Button>
+                  <GameDetailBookmark appid={game.appid} />
                 </div>
               </div>
             </div>

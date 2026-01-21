@@ -40,6 +40,29 @@ export function getReviewLabel(score: number): string {
 }
 
 /**
+ * Review variant type for Badge component
+ */
+export type ReviewVariant = 
+  | 'overwhelming' 
+  | 'very-positive' 
+  | 'positive' 
+  | 'mixed' 
+  | 'negative' 
+  | 'very-negative';
+
+/**
+ * Get review variant for Badge component based on score
+ */
+export function getReviewVariant(score: number): ReviewVariant {
+  if (score >= 95) return 'overwhelming';
+  if (score >= 80) return 'very-positive';
+  if (score >= 70) return 'positive';
+  if (score >= 40) return 'mixed';
+  if (score >= 20) return 'negative';
+  return 'very-negative';
+}
+
+/**
  * Format date to Korean locale
  */
 export function formatDate(dateString: string): string {

@@ -11,6 +11,7 @@ import GameCardSkeleton from './GameCardSkeleton';
 import FilterSidebar from '@/components/filter/FilterSidebar';
 import SortDropdown from '@/components/filter/SortDropdown';
 import TagCloud from '@/components/TagCloud';
+import RecentGamesSection from './RecentGamesSection';
 
 interface ClientGameListProps {
   initialGames: Game[];
@@ -200,6 +201,9 @@ export default function ClientGameList({ initialGames }: ClientGameListProps) {
 
       {/* Main Content */}
       <div className="flex-1 min-w-0">
+        {/* Recent Games Section */}
+        <RecentGamesSection allGames={initialGames} />
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>

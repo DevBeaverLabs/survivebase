@@ -1,8 +1,13 @@
+import { cn } from '@/lib/utils';
 import Container from './Container';
 
-export default function Footer() {
+interface FooterProps {
+  className?: string;
+}
+
+export default function Footer({ className }: FooterProps) {
   return (
-    <footer className="border-t border-border bg-bg-secondary py-12 mt-auto">
+    <footer className={cn("border-t border-border bg-bg-secondary py-12 mt-auto", className)}>
       <Container>
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-col items-center md:items-start gap-2">
