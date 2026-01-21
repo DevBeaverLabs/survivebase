@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "format": "prettier --write .",
+    "collect-data": "npx tsx scripts/collect-data.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -25,6 +27,7 @@
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
