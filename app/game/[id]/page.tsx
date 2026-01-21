@@ -5,6 +5,7 @@ import Container from '@/components/layout/Container';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import ImageWithFallback from '@/components/ui/ImageWithFallback';
+import SimilarGames from '@/components/game/SimilarGames';
 import { formatPrice, getReviewLabel, getSteamUrl, cn } from '@/lib/utils';
 
 interface GamePageProps {
@@ -23,7 +24,10 @@ export async function generateStaticParams() {
 
 export default async function GamePage({ params }: GamePageProps) {
   const gameId = parseInt(params.id);
-  const game = await getGameById(gameId);
+  const [game, allGames] = await Promise.all([
+    getGameById(gameId),
+    getGames(),
+  ]);
 
   if (!game) {
     notFound();
@@ -192,6 +196,9 @@ export default async function GamePage({ params }: GamePageProps) {
             </div>
           </div>
         </div>
+
+        {/* Similar Games Section */}
+        <SimilarGames currentGame={game} allGames={allGames} />
       </Container>
     </div>
   );

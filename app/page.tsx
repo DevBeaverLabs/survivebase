@@ -1,9 +1,20 @@
+import { Suspense } from 'react';
 import { getGames } from '@/lib/cache';
 import Container from '@/components/layout/Container';
-import GameListWithScroll from '@/components/game/GameListWithScroll';
-import SortDropdown from '@/components/filter/SortDropdown';
+import ClientGameList from '@/components/game/ClientGameList';
+import GameCardSkeleton from '@/components/game/GameCardSkeleton';
 
 export const revalidate = 3600; // Revalidate every hour
+
+function GameListSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {Array.from({ length: 12 }).map((_, i) => (
+        <GameCardSkeleton key={i} />
+      ))}
+    </div>
+  );
+}
 
 export default async function HomePage() {
   const games = await getGames();
@@ -20,17 +31,9 @@ export default async function HomePage() {
           </p>
         </section>
 
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 pb-6 border-b border-border">
-          <div className="flex flex-col gap-1">
-            <h2 className="text-xl font-bold text-text-primary">전체 게임</h2>
-            <p className="text-sm text-text-secondary">{games.length}개의 게임이 등록되어 있습니다.</p>
-          </div>
-          
-          {/* Default sort is 'popular' as per requirements */}
-          <SortDropdown value="popular" />
-        </div>
-
-        <GameListWithScroll games={games} />
+        <Suspense fallback={<GameListSkeleton />}>
+          <ClientGameList initialGames={games} />
+        </Suspense>
       </Container>
     </div>
   );

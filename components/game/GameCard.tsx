@@ -3,6 +3,7 @@ import { Game } from '@/types';
 import { formatPrice, getReviewLabel, cn } from '@/lib/utils';
 import ImageWithFallback from '../ui/ImageWithFallback';
 import Badge from '../ui/Badge';
+import BookmarkButton from './BookmarkButton';
 
 interface GameCardProps {
   game: Game;
@@ -22,6 +23,11 @@ export default function GameCard({ game }: GameCardProps) {
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
             className="object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+          <BookmarkButton
+            appid={game.appid}
+            size="sm"
+            className="absolute top-2 left-2 shadow-lg shadow-bg-primary/40"
           />
           {hasDiscount && (
             <div className="absolute bottom-2 right-2">
